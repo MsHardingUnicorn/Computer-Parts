@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Build-a-Computer Game!</title>
+  <!-- Bright, grade-friendly styling -->
+  <style>
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f2faff;
+      margin: 0;
+      padding: 0;
+      color: #222;
+    }
+    #app {
+      max-width: 880px;
+      margin: 0 auto;
+      padding: 1em;
+    }
+    .screen {
+      display: none;
+    }
+    .active {
+      display: block;
+    }
+    h1, h2, h3 {
+      color: #2096f3;
+      margin: 0.6em 0;
+    }
+    .guide {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    .guide-emoji {
+      font-size: 2em;
+      border-radius: 50%;
+      padding: .25em;
+      background: #d1ebfa;
+      border: 2px solid #90caf9;
+    }
+    .input-row {
+      margin: 1em 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    label {
+      font-weight: bold;
+    }
+    input[type="text"] {
+      font-size: 1.2em;
+      padding: 0.3em;
+      border: 2px solid #90caf9;
+      border-radius: 5px;
+      width: 14em;
+    }
+    button {
+      font-size: 1.1em;
+      padding: 0.5em 1.2em;
+      margin-top: 1em;
+      background: #2096f3;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background .18s;
+    }
+    button:active, button:focus {
+      background: #1976d2;
+    }
+    .parts-area {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.1em;
+      margin: .8em 0;
+      min-height: 140px;
+    }
+    .part-draggable, .part-label {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: .5em .8em;
+      border-radius: 8px;
+      box-shadow: 0 3px 7px #d6e9fa;
+      background: #e3f2fd;
+      margin: .5em 0;
+      cursor: move;
+      user-select: none;
+      min-width: 80px;
+      font-weight: bold;
+      font-size: 1.1em;
+      transition: background 0.2s, box-shadow 0.15s;
+    }
+    .part-draggable[draggable="false"] {
+      background: #b2ebf2;
+      cursor: default;
+      opacity: 0.55;
+    }
+    .dropzone-droppable {
+      border: 3px dashed #90caf9;
+      background: #f0faff;
+      min-height: 60px;
+      min-width: 140px;
+      margin: 10px;
+      margin-right: 0;
+      margin-left: 0;
+      padding: .3em;
+      text-align: center;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .dropzone-droppable.dropping {
+      background: #bbdefb;
+      border-color: #1976d2;
+    }
+    .labels-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.8em;
+    }
+    .feedback {
+      margin: 0.5em 0;
+      font-weight: bold;
+      color: #388e3c;
+    }
+    .explanation-box {
+      background: #fffde7;
+      border-left: 7px solid #ffd600;
+      margin: .8em 0;
+      padding: .6em 1em;
+      border-radius: 6px;
+      font-size: 1em;
+      color: #333;
+    }
+    .diagram-area {
+      text-align: center;
+      margin: 2em 0 1em;
+    }
+    .diagram-img {
+      width: 480px;
+      max-width: 98vw;
+      margin-bottom: .6em;
+      border: 2px solid #90caf9;
+      border-radius: 9px;
+      background: #e3f2fd;
+      box-shadow: 0 0 10px #ddeeff;
+    }
+    @media (max-width: 700px) {
+      .diagram-img {
+        width: 95vw;
+      }
+      #app {
+        padding: .2em;
+      }
+    }
+
+    /* Score summary */
+    .score-summary {
+      background: #dcedc8;
+      color: #20582a;
+      border-radius: 8px;
+      padding: 1.3em 1em;
+      margin: 1.1em 0;
+      font-size: 1.13em;
+      box-shadow: 0 2px 5px #bddab7;
+    }
+    .worksheet-btns {
+      margin-top: 2em;
+      display: flex;
+      flex-direction: row;
+      gap: 1em;
+    }
+    /* Printable style (for PDF/print) */
+    @media print {
+      body {background: white;}
+      #app {max-width: none; margin: 0; padding: 0;}
+      .screen, .active {display: block !important;}
+      button, .worksheet-btns, .no-print {display: none !important;}
+      .diagram-img {border-color: #666;}
+    }
+  </style>
+</head>
+<body>
+<div id="app">
+  <!-- Screens handled by JS -->
+  <!-- 1. Welcome Screen -->
+  <div id="welcome-screen" class="screen active">
+    <div class="guide"><span class="guide-emoji">👩‍💻</span>
+      <div>
+        <h1>Welcome to <span style="color:#ffd600">Build-a-Computer!</span></h1>
+        <p>Your friendly guide: Byte the Robot.</p>
+      </div>
+    </div>
+    <form id="name-form" autocomplete="off">
+      <div class="input-row">
+        <label for="studentName">What’s your name?</label>
+        <input id="studentName" type="text" maxlength="32" required placeholder="Type your name...">
+      </div>
+      <button type="submit">Start Game</button>
+    </form>
+    <div style="margin-top:2em;">
+      <h3>How to Play</h3>
+      <ul>
+        <li>Take apart a computer by dragging parts away!</li>
+        <li>Label each part, and learn what it does.</li>
+        <li>Rebuild the computer and see how well you did!</li>
+      </ul>
+    </div>
+  </div>
+  
+  <!-- 2. Take-Apart Game Screen -->
+  <div id="tear-down-screen" class="screen">
+    <div class="guide"><span class="guide-emoji">🤖</span>
+      <h2>Take Apart the Computer</h2>
+    </div>
+    <div style="margin-bottom:1em">Drag each computer <b>part</b> out of the diagram.<br>Click a part to learn about it!</div>
+    <div class="diagram-area">
+      <img src="https://i.imgur.com/l6kTn86.png" alt="Computer Diagram" class="diagram-img" id="tear-down-image">
+      <!-- Simplified placeholder. Replace with your own diagram for customization -->
+      <div id="parts-draggable" class="parts-area"></div>
+    </div>
+    <div id="part-explanation" class="explanation-box" style="display:none"></div>
+    <button id="tear-down-next">All Done! Next Step →</button>
+  </div>
+  
+  <!-- 3. Labeling Game Screen -->
+  <div id="labeling-screen" class="screen">
+    <div class="guide">
+      <span class="guide-emoji">💡</span>
+      <h2>Label the Computer Parts</h2>
+    </div>
+    <div>Drag the <b>labels</b> onto each part.</div>
+    <div id="label-diagram-area" class="diagram-area"></div>
+    <div class="labels-list" id="label-list"></div>
+    <div id="label-feedback" class="feedback"></div>
+    <button id="labeling-next">Rebuild Computer!</button>
+  </div>
+  
+  <!-- 4. Rebuild Game Screen -->
+  <div id="rebuild-screen" class="screen">
+    <div class="guide"><span class="guide-emoji">🛠️</span>
+      <h2>Rebuild the Computer</h2>
+    </div>
+    <div>Now, drag the parts back to rebuild the computer!</div>
+    <div class="diagram-area" id="rebuild-diagram-area"></div>
+    <button id="rebuild-finish">See My Score!</button>
+  </div>
+  
+  <!-- 5. Score & Printouts Screen -->
+  <div id="score-screen" class="screen">
+    <div class="guide"><span class="guide-emoji">🎉</span>
+      <h2>Awesome Work, <span id="final-student-name"></span>!</h2>
+    </div>
+    <div class="score-summary" id="score-summary"></div>
+    <div>
+      <b>Parts you learned:</b>
+      <ul id="parts-learned-list"></ul>
+    </div>
+    <div class="worksheet-btns">
+      <button id="download-pdf-btn">Download PDF Report</button>
+      <button id="print-worksheet-btn">Print Worksheet</button>
+    </div>
+    <button onclick="location.reload()" class="no-print" style="margin-top:2em;">Play Again</button>
+  </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+// ------------ CONFIGURABLE COMPUTER PARTS DATA -----------
+// To add or remove parts, simply edit this array below.
+const COMPUTER_PARTS = [
+  {
+    id: "monitor",
+    displayName: "Monitor",
+    explanation: "The monitor shows you what the computer is doing. It's like the computer's TV screen.",
+    function: "Displays images and text from the computer.",
+    image: "🖥️", 
+    position: { left: "60px", top: "40px" } // Not used, but for future teacher use.
+  },
+  {
+    id: "keyboard",
+    displayName: "Keyboard",
+    explanation: "You use the keyboard to type letters, numbers, and commands into the computer.",
+    function: "Helps you type, enter information, and give commands.",
+    image: "⌨️"
+  },
+  {
+    id: "mouse",
+    displayName: "Mouse",
+    explanation: "Move the mouse to point, click, and move things on the screen.",
+    function: "Lets you move a pointer and select things.",
+    image: "🖱️"
+  },
+  {
+    id: "tower",
+    displayName: "Computer Tower (CPU Case)",
+    explanation: "This is the big box that holds all the important working parts of the computer.",
+    function: "Holds all the main internal parts.",
+    image: "🗄️"
+  },
+  {
+    id: "motherboard",
+    displayName: "Motherboard",
+    explanation: "The main 'board' that connects all the parts together. Like the boss!",
+    function: "Connects and lets all computer parts talk to each other.",
+    image: "🔌"
+  },
+  {
+    id: "ram",
+    displayName: "RAM",
+    explanation: "RAM is fast memory used while the computer works. Like a desk where you put things you’re working on now.",
+    function: "Stores info the computer is actively using.",
+    image: "📦"
+  },
+  {
+    id: "storage",
+    displayName: "Hard Drive / SSD",
+    explanation: "This mostly stores your files, pictures, and programs long-term.",
+    function: "Saves data and files even when the computer is off.",
+    image: "💽"
+  },
+  {
+    id: "power",
+    displayName: "Power Supply",
+    explanation: "Gives energy to all the computer parts. Like your computer’s engine!",
+    function: "Supplies electrical power.",
+    image: "🔋"
+  },
+  {
+    id: "fan",
+    displayName: "Fan",
+    explanation: "Keeps the inside of the computer cool so nothing gets too hot.",
+    function: "Cools parts to prevent overheating.",
+    image: "🌀"
+  },
+  {
+    id: "gpu",
+    displayName: "Graphics Card",
+    explanation: "This helps create pictures and videos to show on the monitor.",
+    function: "Creates images and video; helps games and visuals look better.",
+    image: "🎮"
+  }
+];
+// --------- Teacher customizations --------
+// To: Remove a part, comment out or delete its object above.
+// To: Increase difficulty, add more objects with new ids names/definitions.
+// To: Change worksheet questions, scroll down to the PDF/print functions.
+
+// ------------ END CONFIGURABLE DATA -----------
+
+// ------- Game state -------
+let studentName = "";
+let gameScore = {
+  correctLabels: 0,
+  totalParts: COMPUTER_PARTS.length,
+  attempts: 0,
+  labeledParts: {}, // partId => label given
+};
+let dateString = new Date().toLocaleDateString("en-US", { year:"numeric", month: "short", day:"numeric" });
+
+// ------------- Helper Functions ---------------
+
+// Fisher-Yates shuffle to randomize label order
+function shuffleArray(a) {
+  for (let i = a.length - 1; i > 0; i--) {
+    let j = Math.floor(Math.random() * (i+1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+
+// ------------------------ Game Logic ------------------------
+// App screens
+const SCREENS = [
+  'welcome-screen',
+  'tear-down-screen',
+  'labeling-screen',
+  'rebuild-screen',
+  'score-screen'
+];
+function showScreen(id) {
+  SCREENS.forEach(s => document.getElementById(s).classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// 1. Welcome
+document.getElementById("name-form").onsubmit = function(e){
+  e.preventDefault();
+  studentName = document.getElementById("studentName").value.trim();
+  if(!studentName) return;
+  showScreen("tear-down-screen");
+  setupTearDown();
+};
+
+// 2. Take Apart
+function setupTearDown() {
+  // Clear
+  document.getElementById("parts-draggable").innerHTML = "";
+  document.getElementById("part-explanation").style.display = 'none';
+  // Populate draggable parts
+  COMPUTER_PARTS.forEach(part=> {
+    let el = document.createElement("div");
+    el.className = "part-draggable";
+    el.setAttribute("draggable", true);
+    el.setAttribute("data-id", part.id);
+    el.innerHTML = `<span style="font-size:2em">${part.image}</span> <span>${part.displayName}</span>`;
+    // Add click explanation
+    el.onclick = () => {
+      let exp = document.getElementById("part-explanation");
+      exp.textContent = `${part.displayName}: ${part.explanation}`;
+      exp.style.display = "block";
+    };
+    // Drag logic
+    el.ondragstart = function(ev) {
+      ev.dataTransfer.setData("text/plain", part.id);
+      setTimeout(()=>{ el.style.visibility = 'hidden'; }, 50);
+    };
+    el.ondragend = function() {
+      el.style.visibility = '';
+    };
+    document.getElementById("parts-draggable").appendChild(el);
+  });
+  // Drag-destination: area outside means "removed"
+  document.getElementById("tear-down-image").ondragover = (ev) => {
+    ev.preventDefault();
+  }
+  // On drop, mark part as removed (simulate)
+  document.getElementById("tear-down-image").ondrop = (ev) => {
+    ev.preventDefault();
+    let partId = ev.dataTransfer.getData("text/plain");
+    let partEl = document.querySelector(`.part-draggable[data-id='${partId}']`);
+    if(partEl) {
+      partEl.setAttribute("draggable", false);
+      partEl.style.opacity = 0.35;
+      partEl.style.pointerEvents = "none";
+      partEl.innerHTML += " <span style='color:#b71c1c'>(Taken out!)</span>";
+    }
+    // Encourage message
+    document.getElementById("part-explanation").textContent = 
+      "Good job! Keep going until all parts are out.";
+    document.getElementById("part-explanation").style.display = "block";
+    checkTearDownComplete();
+  };
+  // Next only enabled after all taken out
+  document.getElementById("tear-down-next").disabled = true;
+}
+function checkTearDownComplete(){
+  let finished = true;
+  document.querySelectorAll("#parts-draggable .part-draggable").forEach(el=>{
+    if(el.getAttribute("draggable") !== "false") finished = false;
+  });
+  document.getElementById("tear-down-next").disabled = !finished;
+}
+document.getElementById("tear-down-next").onclick = ()=>{
+  showScreen("labeling-screen");
+  setupLabeling();
+};
+
+// 3. Labeling
+let labelsOrder = [];
+function setupLabeling(){
+  document.getElementById("label-diagram-area").innerHTML = "";
+  document.getElementById("label-list").innerHTML = "";
+  document.getElementById("label-feedback").textContent = "";
+  // Show all part placeholders (as dropzones)
+  COMPUTER_PARTS.forEach(part=>{
+    let dz = document.createElement("div");
+    dz.className = "dropzone-droppable";
+    dz.setAttribute("data-id", part.id);
+    dz.innerHTML = `<span style="font-size:2em">${part.image}</span> <br>
+      <span style="font-size:.98em; color:#888">Drop label here</span>`;
+    dz.ondragover = (ev) => {
+      ev.preventDefault();
+      dz.classList.add("dropping");
+    };
+    dz.ondragleave = ()=>dz.classList.remove("dropping");
+    dz.ondrop = (ev)=>{
+      ev.preventDefault();
+      dz.classList.remove("dropping");
+      let labelId = ev.dataTransfer.getData("text/plain");
+      assignLabel(dz, labelId);
+    };
+    document.getElementById("label-diagram-area").appendChild(dz);
+  });
+  // Shuffle and create label elements
+  labelsOrder = shuffleArray([...COMPUTER_PARTS.map(p=>p.id)]);
+  labelsOrder.forEach(partId=>{
+    let part = COMPUTER_PARTS.find(p=>p.id===partId);
+    let el = document.createElement("div");
+    el.className = "part-label";
+    el.textContent = part.displayName;
+    el.setAttribute("data-id", part.id);
+    el.setAttribute("draggable","true");
+    el.ondragstart = (ev)=>ev.dataTransfer.setData("text/plain", part.id);
+    document.getElementById("label-list").appendChild(el);
+  });
+  document.getElementById("labeling-next").disabled = true;
+}
+
+function assignLabel(dropzone, labelId){
+  // Prevent double assignment
+  if(dropzone.getAttribute("data-assigned") === "true") return;
+  let partId = dropzone.getAttribute("data-id");
+  let correct = (partId === labelId);
+  gameScore.attempts += 1;
+  let labelEl = document.querySelector(`.part-label[data-id='${labelId}']`);
+  if(labelEl) labelEl.style.display = "none";
+  dropzone.innerHTML = `<span style="font-size:2em">${COMPUTER_PARTS.find(p=>p.id===labelId).image}</span><br>
+    <b>${COMPUTER_PARTS.find(p=>p.id===labelId).displayName}</b>`;
+  dropzone.style.background = correct ? "#c8e6c9" : "#ffe0b2";
+  dropzone.setAttribute("data-assigned","true");
+  gameScore.labeledParts[partId] = labelId;
+  if(correct){ 
+    gameScore.correctLabels += 1;
+    showLabelFeedback("✅ Correct! " + COMPUTER_PARTS.find(p=>p.id===labelId).explanation, true);
+  }else{
+    showLabelFeedback("Oops! Try again later. This will be counted as a learning attempt.", false);
+  }
+  checkLabelingComplete();
+}
+
+function showLabelFeedback(text, positive=true){
+  document.getElementById("label-feedback").textContent = text;
+  document.getElementById("label-feedback").style.color = positive ? "#388e3c" : "#b71c1c";
+}
+
+function checkLabelingComplete(){
+  let allDone = true;
+  document.querySelectorAll("#label-diagram-area .dropzone-droppable").forEach(dz=>{
+    if(dz.getAttribute("data-assigned")!=="true") allDone = false;
+  });
+  document.getElementById("labeling-next").disabled = !allDone;
+}
+
+document.getElementById("labeling-next").onclick = ()=>{
+  showScreen("rebuild-screen");
+  setupRebuild();
+};
+
+// 4. Rebuild
+function setupRebuild(){
+  let container = document.getElementById("rebuild-diagram-area");
+  container.innerHTML = "";
+  // Dropzones: computer "diagram"
+  COMPUTER_PARTS.forEach(part=>{
+    let dz = document.createElement("div");
+    dz.className = "dropzone-droppable";
+    dz.setAttribute("data-id",part.id);
+    dz.innerHTML = "<span style='color:#bbb'>Drop part here</span>";
+    dz.ondragover = (ev) => {
+      ev.preventDefault();
+      dz.classList.add("dropping");
+    };
+    dz.ondragleave = ()=>dz.classList.remove("dropping");
+    dz.ondrop = (ev)=>{
+      ev.preventDefault();
+      dz.classList.remove("dropping");
+      let partId = ev.dataTransfer.getData("text/plain");
+      assignRebuild(dz, partId);
+    }
+    container.appendChild(dz);
+  });
+  // Parts to drag back in
+  COMPUTER_PARTS.forEach(part=>{
+    let el = document.createElement("div");
+    el.className = "part-draggable";
+    el.setAttribute("data-id", part.id);
+    el.setAttribute("draggable", true);
+    el.style.background = "#ffd54f";
+    el.innerHTML = `<span style="font-size:2em">${part.image}</span> <span>${part.displayName}</span>`;
+    el.ondragstart = (ev)=> ev.dataTransfer.setData("text/plain", part.id);
+    container.appendChild(el);
+  });
+  document.getElementById("rebuild-finish").disabled = true;
+}
+function assignRebuild(dropzone, partId){
+  // Place image and name
+  let part = COMPUTER_PARTS.find(p=>p.id===partId);
+  dropzone.innerHTML = `<span style="font-size:2em">${part.image}</span> <br>${part.displayName}`;
+  dropzone.style.background = "#b3e5fc";
+  dropzone.setAttribute("data-assigned","true");
+  // Remove draggable part visually
+  let partEl = document.querySelector(`#rebuild-diagram-area .part-draggable[data-id='${partId}']`);
+  if(partEl) partEl.style.display = "none";
+  checkRebuildComplete();
+}
+function checkRebuildComplete(){
+  let allDone=true;
+  document.querySelectorAll("#rebuild-diagram-area .dropzone-droppable").forEach(dz=>{
+    if(dz.getAttribute("data-assigned")!=="true") allDone=false;
+  });
+  document.getElementById("rebuild-finish").disabled = !allDone;
+}
+document.getElementById("rebuild-finish").onclick = ()=>{
+  showScreen("score-screen");
+  setupScore();
+};
+
+// 5. Score and Summary Screen
+function setupScore(){
+  // Student name
+  document.getElementById("final-student-name").textContent = studentName;
+  // Score
+  let summary = `You labeled <b>${gameScore.correctLabels} out of ${gameScore.totalParts}</b> computer parts correctly!
+    <br>It took you <b>${gameScore.attempts}</b> attempts.<br>
+    <span style='font-size:1.08em;color:#2979ff'>Well done – you’re a computer whiz!</span>`;
+  document.getElementById("score-summary").innerHTML = summary;
+  // List of parts
+  let ul = document.getElementById("parts-learned-list");
+  ul.innerHTML = "";
+  COMPUTER_PARTS.forEach(p=>{
+    let li = document.createElement("li");
+    li.innerHTML = `<b>${p.displayName}</b>: ${p.function}`;
+    ul.appendChild(li);
+  });
+}
+
+// ------------ PDF/Worksheet Generation ------------
+
+// 1. Generate PDF Report
+document.getElementById("download-pdf-btn").onclick = function(){
+  const { jsPDF } = window.jspdf;
+  let doc = new jsPDF({unit:'pt', format:'a4'});
+  doc.setFont("helvetica");
+  doc.setFontSize(24);
+  doc.text("Build-a-Computer Game: Report", 40, 55);
+  doc.setFontSize(13);
+  doc.text(`Student: ${studentName||"__________"}`, 40, 85);
+  doc.text(`Date: ${dateString}`, 340, 85);
+  doc.text(`Score: ${gameScore.correctLabels} / ${gameScore.totalParts}`, 40, 110);
+  doc.text(`Attempts: ${gameScore.attempts}`, 340, 110)
+  doc.setFontSize(15);
+  doc.text("Computer Parts Learned:", 40, 145);
+  doc.setFontSize(12);
+  let y = 168;
+  COMPUTER_PARTS.forEach((p, i)=>{
+    doc.text(`${i+1}. ${p.displayName}: ${p.function}`, 42, y);
+    y += 19;
+  });
+  doc.setLineWidth(.7);
+  doc.rect(35, 30, 530, y-5, 'S');
+  doc.setFontSize(12);
+  doc.text("Awesome work using computer words! 🎉", 40, y + 25);
+  doc.save(`${studentName || "student"}-BuildAComputer-Report.pdf`);
+};
+
+// 2. Print as Worksheet
+document.getElementById("print-worksheet-btn").onclick = function(){
+  // Pop-in printable worksheet overlay
+  let win = window.open('', '', 'width=800,height=900');
+  win.document.write(`
+    <html>
+    <head>
+    <title>Build-a-Computer Worksheet</title>
+    <style>
+      body{font-family:'Segoe UI',Arial,sans-serif; margin:1em;}
+      h2, h3{color:#2196f3;margin:0.6em 0;}
+      .diagram-img{width:440px;max-width:98vw;margin:0.7em 0; border:2px solid #2196f3;border-radius:9px;}
+      .label-bw{font-weight:bold;font-size:1em;}
+      .big{font-size:1.15em;}
+      .match-table{border-spacing:0 12px;}
+      .match-table td{padding:7px 0;}
+      .question{margin:1.2em 0 .6em;}
+      .print-area{page-break-after:always;}
+    </style>
+    </head>
+    <body>
+    <div class="print-area">
+      <h2>Build-a-Computer Worksheet</h2>
+      <div><b>Student Name:</b> ___________________ &nbsp;&nbsp; <b>Date:</b> _________________</div>
+      <h3>1. Label the Computer Diagram</h3>
+      <img src="https://i.imgur.com/l6kTn86.png" class="diagram-img" alt="computer diagram (label the parts)">
+      <div>Draw lines from the words to the correct parts.</div>
+      <div>
+        ${COMPUTER_PARTS.map(p=>'<span class="label-bw">'+p.displayName+'</span>').join(' – ')}
+      </div>
+      <h3 class="question">2. Match the Parts with Their Functions</h3>
+      <table class="match-table">
+        ${shuffleArray([...COMPUTER_PARTS]).map((p,i)=>`
+        <tr>
+          <td class="big">${i+1}. <b>${p.displayName}</b></td>
+          <td>__________</td>
+        </tr>
+        `).join('')}
+      </table>
+      <div><i>Teacher: write functions in random order for matching.</i></div>
+      <h3 class="question">Reflection:</h3>
+      <div>Which computer part was easiest to remember and why?</div>
+      <div style="border-bottom:1px solid #bbb;height:25px;width:450px;margin:14px 0;"></div>
+      <div style="border-bottom:1px solid #bbb;height:25px;width:450px;margin-bottom:10px"></div>
+    </div>
+    </body>
+    </html>
+  `);
+  win.document.close();
+  win.focus();
+  win.print();
+};
+
+</script>
+</body>
+</html>
