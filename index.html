@@ -4,50 +4,56 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Build-a-Computer Game!</title>
-  <!-- Bright, grade-friendly styling -->
-  <style>/* ...styles unchanged for brevity... */
-  </style>
-</head>
-<body>
-<div id="app">
-  <!-- Screens handled by JS -->
-  <!-- 1. Welcome Screen -->
-  <div id="welcome-screen" class="screen active"> <!-- ...unchanged... --> </div>
 
-  <!-- 2. Take-Apart Game Screen -->
-  <div id="tear-down-screen" class="screen">
-    <div class="guide"><span class="guide-emoji">🤖</span>
-      <h2>Take Apart the Computer</h2>
-    </div>
-    <div style="margin-bottom:1em">Drag each computer <b>part</b> out of the diagram.<br>Click a part to learn about it!</div>
-    <div class="diagram-area">
-      <img src="https://upload.wikimedia.org/wikipedia/commons/6/6c/Personal_computer,_exploded.svg" alt="Computer Diagram" class="diagram-img" id="tear-down-image">
-      <!-- Simplified placeholder. Replace with your own diagram for customization -->
-      <div id="parts-draggable" class="parts-area"></div>
-    </div>
-    <div id="part-explanation" class="explanation-box" style="display:none"></div>
-    <button id="tear-down-next">All Done! Next Step →</button>
-  </div>
-  
-  <!-- 3. Labeling Game Screen -->
-  <div id="labeling-screen" class="screen"> <!-- ...unchanged... --> </div>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: #eef5fb;
+      margin: 0;
+    }
 
-  <!-- 4. Rebuild Game Screen -->
-  <div id="rebuild-screen" class="screen"> <!-- ...unchanged... --> </div>
-  
-  <!-- 5. Score & Printouts Screen -->
-  <div id="score-screen" class="screen"> <!-- ...unchanged... --> </div>
-</div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script>
-// ...all script unchanged except for worksheet diagram image replacement...
-// Worksheet printout: update diagram image src
-// (Within the print worksheet window code):
-// Replace
-// <img src="https://i.imgur.com/l6kTn86.png" class="diagram-img" alt="computer diagram (label the parts)">
-// with
-// <img src="https://upload.wikimedia.org/wikipedia/commons/6/6c/Personal_computer,_exploded.svg" class="diagram-img" alt="computer diagram (label the parts)">
-// Everything else remains unchanged.
-</script>
-</body>
-</html>
+    .screen {
+      display: none;
+      padding: 20px;
+    }
+
+    .active {
+      display: block;
+    }
+
+    h1, h2 {
+      color: #333;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin: 10px;
+      border: none;
+      border-radius: 6px;
+      background: #4CAF50;
+      color: white;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #45a049;
+    }
+
+    .diagram-img {
+      max-width: 90%;
+      border: 2px solid #ccc;
+      border-radius: 10px;
+      margin: 10px;
+    }
+
+    .parts-area {
+      margin-top: 20px;
+    }
+
+    .part {
+      display: inline-block;
+      padding: 10px;
+      margin: 8px;
+      background: #d9e8f5;
