@@ -1,59 +1,18 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Build-a-Computer Game!</title>
+<div id="tear-down-screen" class="screen">
+  <h2>Take Apart the Computer</h2>
+  <p>Click each part to learn about it!</p>
 
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      background: #eef5fb;
-      margin: 0;
-    }
+  <!-- ✅ CORRECT IMAGE -->
+  <img 
+    src="https://upload.wikimedia.org/wikipedia/commons/6/6c/Personal_computer,_exploded.svg" 
+    class="diagram-img"
+    alt="Computer Diagram"
+  >
 
-    .screen {
-      display: none;
-      padding: 20px;
-    }
+  <div class="parts-area" id="parts"></div>
 
-    .active {
-      display: block;
-    }
+  <div id="info" class="explanation-box" style="display:none"></div>
 
-    h1, h2 {
-      color: #333;
-    }
-
-    button {
-      padding: 10px 20px;
-      font-size: 16px;
-      margin: 10px;
-      border: none;
-      border-radius: 6px;
-      background: #4CAF50;
-      color: white;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background: #45a049;
-    }
-
-    .diagram-img {
-      max-width: 90%;
-      border: 2px solid #ccc;
-      border-radius: 10px;
-      margin: 10px;
-    }
-
-    .parts-area {
-      margin-top: 20px;
-    }
-
-    .part {
-      display: inline-block;
-      padding: 10px;
-      margin: 8px;
-      background: #d9e8f5;
+  <button onclick="showScreen('score-screen')">Next →</button>
+</div>
+``
